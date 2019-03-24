@@ -20,6 +20,7 @@ class UserModel extends BaseActiveRecord
         $query->bindParam(":Password", $this->Password);
         $query->bindParam(":Role_Id", $this->Role_Id);
         $query->execute();
+            echo "Пользователь добавлен!";
     }
 
     public static function getUser($login, $password)

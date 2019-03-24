@@ -11,26 +11,27 @@
 <body>
 <div class="wrapper">
     <div class="content">
-        <div class="currentTime" id="currentTime"></div>
+        <div class="user-banner">
+            <div class="currentTime" id="currentTime"></div>
+        </div>
         <a name="top"></a>
         <header>
-            <h1>Статистика помещений</h1>
+            <h1>Статистика поcещений</h1>
         </header>
         <a class="loadRecordsBtn" href="/admin" role="button">Назад</a>
-
         <?php
         echo "<div class='pull-right'>";
         for( $i = 0; $i < $args["countPages"]; $i++ ) {
             $index = $i + 1;
             if($i == $args["page"]) {
-                echo "<a class='btn btn-default btn-primary' href='/admin/visitStatistic?page=$i' role='button'>$index</a>";
+                echo "<a class='pagesBtn' href='/visits?page=$i' role='button'>$index</a>";
             } else {
-                echo "<a class='btn btn-default'href='/admin/visitStatistic?page=$i' role='button'>$index</a>";
+                echo "<a class='pagesBtn' href='/visits?page=$i' role='button'>$index</a>";
             }
         }
         echo "</div>";
         ?>
-        <table class="table table-bordered table-responsive table-hover">
+        <table border="1" class="educationTable">
             <thead>
             <tr>
                 <th>Дата посещения</th>
@@ -59,9 +60,9 @@
         for( $i = 0; $i < $args["countPages"]; $i++ ) {
             $index = $i + 1;
             if($i == $args["page"]) {
-                echo "<a class='btn btn-default btn-primary' href='/admin/visitStatistic?page=$i' role='button'>$index</a>";
+                echo "<a class='pagesBtn' href='/visits?page=$i' role='button'>$index</a>";
             } else {
-                echo "<a class='btn btn-default'href='/admin/visitStatistic?page=$i' role='button'>$index</a>";
+                echo "<a class='pagesBtn' href='/visits?page=$i' role='button'>$index</a>";
             }
         }
         echo "</div>";

@@ -11,7 +11,14 @@
 <body onload="sessionStorageHistory('Блог'); setCookie('Блог')">
 <div class="wrapper">
     <div class="content">
-        <div class="currentTime" id="currentTime"></div>
+        <div class="user-banner">
+            <div class="currentTime" id="currentTime"></div>
+            <div class="user-info">
+                <?php
+                echo $args["userInfo"];
+                ?>
+            </div>
+        </div>
         <a name="top"></a>
         <header>
             <h1>Вы попали на персональный сайт <br> Герцовской Карины Владиславовны</h1>
@@ -27,7 +34,11 @@
                 <li><a id="Test" href="/test" onmouseover="setBackground('Test')" onmouseout="restore('Test')">Входное тестирование</a></li>
                 <li><a id="Guest" href="/guest_book" onmouseover="setBackground('Guest')" onmouseout="restore('Guest_book')">Гостевая книга</a></li>
                 <li class="active"><a id="Blog" href="/blog" onmouseover="setBackground('Blog')" onmouseout="restore('Blog')">Блог</a></li>
-                <li><a id="Admin" href="/admin" onmouseover="setBackground('Admin')" onmouseout="restore('Admin')">Админ</a></li>
+                <?php
+                if($args["isAdmin"]) {
+                    echo '<li><a href="/admin">Админ</a></li>';
+                }
+                ?>
                 <li class="last"><a id="History" href="/history" onmouseover="setBackground('History')" onmouseout="restore('History')">История просмотров</a></li>
             </ul>
             <div class="mainMenu navigation" id ="inter">
@@ -37,18 +48,17 @@
         <section>
          <!--   <a class="loadRecordsBtn" href="/editBlog" role="button">Редактор блога</a>  -->
             <?php
-            $a = 1;
-            $b = 0;
-            echo "<div class='pull-right'>";
-            for( $i = 0; $i < $args["countPages"]; $i++ ) {
-                $b += 10;
-                if($i == $args["page"]) {
-                    echo "<a class='pagesBtn' href='/blog?page=$i' role='button'>$a-$b</a>";
-                } else {
-                    echo "<a class='pagesBtn pagesBtnPrime' href='/blog?page=$i' role='button'>$a-$b</a>";
-                }
-                $a += 10;
+
+        echo "<div class='pull-right'>";
+        for( $i = 0; $i < $args["countPages"]; $i++ ) {
+            $index = $i + 1;
+            if($i == $args["page"]) {
+                echo "<a class='pagesBtn' href='/blog?page=$i' role='button'>$index</a>";
+            } else {
+                echo "<a class='pagesBtn' href='/blog?page=$i' role='button'>$index</a>";
             }
+        }
+
             echo "</div>";
             foreach($args["records"] as $value) {
                 echo '<div class="blog-record">';

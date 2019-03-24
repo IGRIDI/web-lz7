@@ -21,22 +21,34 @@ class Home extends Controller
 
     public function aboutMe()
     {
-        $this->view->generate($this->className . 'aboutMe');
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("aboutMe");
+        $this->view->generate($this->className . 'aboutMe', compact("userInfo", "isAdmin"));
     }
 
     public function myInterests()
     {
-        $this->view->generate($this->className . 'myInterests');
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("myInterests");
+        $this->view->generate($this->className . 'myInterests', compact("userInfo", "isAdmin"));
     }
 
     public function photoalbum()
     {
-        $this->view->generate($this->className . 'photoalbum');
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("photoalbum");
+        $this->view->generate($this->className . 'photoalbum', compact("userInfo", "isAdmin"));
     }
 
     public function education()
     {
-        $this->view->generate($this->className . 'education');
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("education");
+        $this->view->generate($this->className . 'education', compact("userInfo", "isAdmin"));
     }
 
     public function admin()
@@ -46,16 +58,28 @@ class Home extends Controller
 
     public function visits()
     {
-        $this->view->generate($this->className . 'visits');
+        if (!$this->isInRole("Admin")) {
+            $this->view->generate('401');
+            return null;
+        }
+        if(empty($_GET["page"])) {
+            $page = 0;
+        } else {
+            $page = $_GET["page"];
+        }
+        $records = SiteVisitorModel::paginate($page, $this->countRecords);
+        $count = SiteVisitorModel::getCount();
+        $countPages = round($count / $this->countRecords);
+        $this->saveVisitInformation("visits");
+        $this->view->generate($this->className . 'visits', compact("records", "countPages", "page"));
     }
 
 
     public function guest_book()
     {
-        if (!$this->isInRole("Admin")) {
-            $this->view->generate('401');
-            return null;
-        }
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("guest_book");
 
         if (!empty($_POST)) {
             $this->file = fopen(APP_PATH . "public/files/message.inc", "a");
@@ -81,7 +105,7 @@ class Home extends Controller
             }
             return ($a->Date < $b->Date) ? 1 : -1;
         });
-        $this->view->generate($this->className . 'guest_book', compact("reviews"));
+        $this->view->generate($this->className . 'guest_book', compact("reviews", "userInfo", "isAdmin"));
     }
 
     public function loadRecordsFromFile()
@@ -116,6 +140,9 @@ class Home extends Controller
 
     public function contacts()
     {
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("contacts");
         $errors = [];
         if (!empty($_POST)) {
             $errors = Validation::run([
@@ -126,15 +153,15 @@ class Home extends Controller
                 'tel' => 'tel'
             ]);
         }
-        $this->view->generate($this->className . 'contacts', compact('errors'));
+        $this->view->generate($this->className . 'contacts', compact('errors', "userInfo", "isAdmin"));
     }
 
     public function test()
     {
-        if (!$this->isInRole("Admin")) {
-            $this->view->generate('401');
-            return null;
-        }
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $isAuthorize = $this->isInRole("Admin", "User");
+        $this->saveVisitInformation("test");
         $errors = [];
         $responses = [];
         if (!empty($_POST)) {
@@ -163,21 +190,33 @@ class Home extends Controller
                 $model->save();
             }
         }
-        $this->view->generate($this->className . 'test', compact('errors', 'responses'));
+        $this->view->generate($this->className . 'test', compact('errors', 'responses', "isAuthorize","userInfo", "isAdmin"));
     }
 
     public function table() {
-        $models = TestsModel::getAll();
-        $this->view->generate($this->className . 'table', compact('models'));
+        if($this->isInRole("Admin", "User")) {
+            $this->saveVisitInformation("index");
+            $models = TestsModel::getAll();
+            $this->view->generate($this->className . 'table', compact('models'));
+        } else {
+            $this->view->generate('401');
+        }
     }
 
     public function history()
     {
-        $this->view->generate($this->className . 'history');
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("history");
+        $this->view->generate($this->className . 'history', compact("userInfo", "isAdmin") );
     }
 
     public function blog()
     {
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("blog");
+
         if(empty($_GET["page"])) {
             $page = 0;
         } else {
@@ -186,7 +225,7 @@ class Home extends Controller
         $records = BlogModel::paginate($page, $this->countRecords);
         $count = BlogModel::getCount();
         $countPages = round($count / $this->countRecords);
-        $this->view->generate($this->className . 'blog', compact("records", "countPages", "page"));
+        $this->view->generate($this->className . 'blog', compact("records", "countPages", "page", "userInfo", "isAdmin"));
     }
 
     public function editBlog()
@@ -300,13 +339,22 @@ class Home extends Controller
                 "email" => "email"
             ]);
             if (empty($errors)) {
-                $user = new UserModel();
-                $user->Login = $_POST['login'];
-                $user->Password = hash("sha256", $_POST['password']);
-                $user->Fio = $_POST['fio'];
-                $user->Email = $_POST['email'];
-                $user->Role_Id = 2; //Обычный пользователь
-                $user->save();
+                $regLogin = $_POST['login'];
+                $link=mysqli_connect("localhost","root","","weblaboratory");
+                $result = mysqli_query($link, "SELECT * FROM Users WHERE Login = '$regLogin'");
+                $row_cnt = mysqli_num_rows($result);
+                if ($row_cnt === 0) {
+                    $user = new UserModel();
+                    $user->Login = $_POST['login'];
+                    $user->Password = hash("sha256", $_POST['password']);
+                    $user->Fio = $_POST['fio'];
+                    $user->Email = $_POST['email'];
+                    $user->Role_Id = 2; //Обычный пользователь
+                    $user->save();
+                }
+                else { echo "Пользователь с таким именем существует! "; }
+                mysqli_free_result($result);
+                mysqli_close($link);
             }
         }
         $this->saveVisitInformation("register");
@@ -323,4 +371,6 @@ class Home extends Controller
     {
         echo $error;
     }
+
+
 }

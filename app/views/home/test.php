@@ -12,7 +12,14 @@
 <body onload="sessionStorageHistory('Входное тестирование'); setCookie('Входное тестирование')">
 <div class="wrapper">
     <div class="content">
-        <div class="currentTime" id="currentTime"></div>
+        <div class="user-banner">
+            <div class="currentTime" id="currentTime"></div>
+            <div class="user-info">
+                <?php
+                echo $args["userInfo"];
+                ?>
+            </div>
+        </div>
         <a name="top"></a>
         <header>
             <h1>Вы попали на персональный сайт <br> Герцовской Карины Владиславовны</h1>
@@ -28,7 +35,11 @@
                 <li class="active"><a id="Test" class="active" href="/test">Входное тестирование</a></li>
                 <li><a id="Guest" href="/guest_book" onmouseover="setBackground('Guest')" onmouseout="restore('Guest_book')">Гостевая книга</a></li>
                 <li><a id="Blog" href="/blog" onmouseover="setBackground('Blog')" onmouseout="restore('Blog')">Блог</a></li>
-                <li><a id="Admin" href="/admin" onmouseover="setBackground('Admin')" onmouseout="restore('Admin')">Админ</a></li>
+                <?php
+                if($args["isAdmin"]) {
+                    echo '<li><a href="/admin">Админ</a></li>';
+                }
+                ?>
                 <li><a id="History" href="/history" onmouseover="setBackground('History')" onmouseout="restore('History')">История просмотров</a></li>
             </ul>
             <div class="mainMenu navigation" id ="inter">
@@ -40,8 +51,10 @@
             <form id="tests" method="post" name="testForm" role = "form">
 <!--                  onsubmit="return checkTestData()"-->
                 <fieldset class="fSet1">
-                   <!-- <a class="loadRecordsBtn" href="/table" role="button">Ответы студентов на тест</a> -->
-
+                <?php
+                if($args["isAuthorize"]) {
+                    echo '<a class="loadRecordsBtn" href="/table" role="button">Ответы студентов на тест</a>' ; }
+                ?>
                     <legend>Заполните все поля и дайте правильные ответы</legend>
                     <p>Ваше ФИО:<br>
                         <input type="text" id = "form_fio" size="40" name="FIO" class="inputLength1" title="Фамилия Имя Отчество полностью" data-tooltip-message="Введите Фамилия Имя Отчество полностью" placeholder="Фамилия Имя Отчество полностью">

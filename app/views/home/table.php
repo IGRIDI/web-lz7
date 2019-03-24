@@ -13,7 +13,9 @@
 <body>
 <div class="wrapper">
     <div class="content">
-        <div class="currentTime" id="currentTime"></div>
+        <div class="user-banner">
+            <div class="currentTime" id="currentTime"></div>
+        </div>
         <a name="top"></a>
         <header>
             <h1>Страница ответов на тест</h1>

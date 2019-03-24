@@ -8,7 +8,9 @@
 <body>
 <div class="wrapper">
     <div class="content">
-        <div class="currentTime" id="currentTime"></div>
+        <div class="user-banner">
+            <div class="currentTime" id="currentTime"></div>
+        </div>
         <a name="top"></a>
         <header>
             <h1>Вы попали на персональный сайт <br> Герцовской Карины Владиславовны</h1>
