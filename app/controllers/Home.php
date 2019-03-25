@@ -53,7 +53,14 @@ class Home extends Controller
 
     public function admin()
     {
-        $this->view->generate($this->className . 'admin');
+        if (!$this->isInRole("Admin")) {
+            $this->view->generate('401');
+            return null;
+        }
+        $userInfo = $this->getUserInfo();
+        $isAdmin = $this->isInRole("Admin");
+        $this->saveVisitInformation("admin");
+        $this->view->generate($this->className . 'admin',compact("userInfo", "isAdmin"));
     }
 
     public function visits()
